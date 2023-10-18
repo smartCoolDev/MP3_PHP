@@ -186,7 +186,7 @@ class PHPMP3
      */
     private function doFrameStuff($parts)
     {
-        //Get Audio Version
+        // Get Audio Version
         $seconds = 0;
         $errors  = array();
         switch (substr($parts[1], 3, 2)) {
@@ -203,7 +203,7 @@ class PHPMP3
                 $audio = 1;
                 break;
         }
-        //Get Layer
+        // Get Layer
         switch (substr($parts[1], 5, 2)) {
             case '01':
                 $layer = 3;
@@ -218,7 +218,7 @@ class PHPMP3
                 $layer = 1;
                 break;
         }
-        //Get Bitrate
+        // Get Bitrate
         $bitFlag  = substr($parts[2], 0, 4);
         $bitArray = array(
             '0000' => array(0, 0, 0, 0, 0),
@@ -236,7 +236,7 @@ class PHPMP3
             '1100' => array(384, 256, 224, 192, 128),
             '1101' => array(416, 320, 256, 224, 144),
             '1110' => array(448, 384, 320, 256, 160),
-            '1111' => array(- 1, - 1, - 1, - 1, - 1)
+            '1111' => array(-1, -1, -1, -1, -1)
         );
         $bitPart  = $bitArray[$bitFlag];
         $bitArrayNumber = null;
@@ -258,8 +258,6 @@ class PHPMP3
                     $bitArrayNumber = 3;
                     break;
                 case 2:
-                    $bitArrayNumber = 4;
-                    break;
                 case 3:
                     $bitArrayNumber = 4;
                     break;
@@ -269,7 +267,7 @@ class PHPMP3
         if ($bitRate <= 0) {
             return false;
         }
-        //Get Frequency
+        // Get Frequency
         $frequencies = array(
             1   => array(
                 '00' => 44100,
@@ -292,10 +290,12 @@ class PHPMP3
         );
         $freq        = $frequencies[$audio][substr($parts[2], 4, 2)];
         $frameLength = 0;
-        //IsPadded?
+        // Is Padded?
         $padding = substr($parts[2], 6, 1);
         if ($layer == 3 || $layer == 2) {
             $frameLength = 144 * $bitRate * 1000 / $freq + $padding;
+        } elseif ($layer == 1) {
+            $frameLength = 72 * $bitRate * 1000 / $freq + $padding;
         }
         $frameLength = floor($frameLength);
         if ($frameLength == 0) {
